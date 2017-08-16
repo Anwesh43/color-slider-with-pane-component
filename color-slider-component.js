@@ -4,23 +4,25 @@ class ColorSliderComponent extends HTMLElement {
         super()
         this.img = document.createElement('img')
         this.color = this.getAttribute('color')
-        const shadow = document.createElement('shadow')
+        const shadow = this.attachShadow({mode:'open'})
         shadow.appendChild(this.img)
+        this.img.draggable = false
+        console.log(this.img.draggable)
     }
     render() {
         const canvas = document.createElement('canvas')
         canvas.width = w/4
-        canvas.height = h/20
+        canvas.height = h/15
         const context = canvas.getContext('2d')
         if(!this.colorSlider) {
             this.colorSlider = new ColorSlider(this.color,canvas.width,canvas.height)
         }
-        this.colorSlider.draw(Context)
+        this.colorSlider.draw(context)
         this.img.src = canvas.toDataURL()
     }
     connectedCallback() {
         this.render()
-        this.mouseHandler = new MouseHandler(this.img,this.component,this.colorSlider)
+        this.mouseHandler = new MouseHandler(this.img,this,this.colorSlider)
         this.mouseHandler.handleMouseActions()
     }
 }
@@ -30,24 +32,30 @@ class ColorSlider {
         this.w = w
         this.h = h
         this.x = 0
-        this.y = 0
+        this.y = this.h/2
         this.val = 0
     }
     draw(context) {
+        context.lineCap = 'round'
+        context.fillStyle = this.color
         context.strokeStyle = 'gray'
         context.lineWidth = this.h/3
         context.beginPath()
-        context.moveTo(this.h/2,0)
-        context.lineTo(this.w,0)
+        context.moveTo(this.h/2,this.h/2)
+        context.lineTo(this.w-this.h/2,this.h/2)
+        context.stroke()
+        context.strokeStyle = this.color
+        context.beginPath()
+        context.moveTo(this.h/2,this.h/2)
+        context.lineTo(this.x,this.h/2)
         context.stroke()
         context.beginPath()
-        context.arc(this.x,this.y,this.h/2,0,2*Math.PI)
+        context.arc(this.x+this.h/4,this.y,this.h/2,0,2*Math.PI)
         context.fill()
     }
-    update(x,y) {
-        if(x<=this.w-this.h/2 && x>=0) {
+    update(x) {
+        if(x<=this.w-3*this.h/4 && x>=this.h/4) {
             this.x = x
-            this.y = y
             this.val = ((this.x)/(this.w-this.h/2))*255
         }
     }
@@ -70,7 +78,7 @@ class MouseHandler {
         }
         this.dom.onmousemove = (event) => {
             if(this.down) {
-                this.colorSlider.update(event.offsetX,event.offsetY)
+                this.colorSlider.update(event.offsetX)
                 this.component.render()
             }
         }
@@ -81,3 +89,4 @@ class MouseHandler {
         }
     }
 }
+customElements.define('color-slider-comp',ColorSliderComponent)
