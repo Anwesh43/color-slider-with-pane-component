@@ -115,6 +115,26 @@ class RGBColorSliderGroupComponent extends HTMLElement{
         })
     }
 }
-
+class ColorPaneComponent extends HTMLElement {
+    constructor() {
+        super()
+        const shadow = this.attachShadow({mode:'open'})
+        this.div = document.createElement('div')
+        this.styleDiv()
+        shadow.appendChild(this.div)
+        const rgbColorSlider = document.createElement('rgb-color-slider-group')
+        rgbColorSlider.onchange = (r,g,b)=>{
+            this.div.style.background = `rgb(${r},${g},${b})`
+        }
+        shadow.appendChild(rgbColorSlider)
+    }
+    styleDiv() {
+        this.div.style.width = w/10
+        this.div.style.height = w/10
+        this.div.style.background = 'black'
+        this.div.style.borderRadius = '20%'
+    }
+}
+customElements.define('color-pane-comp',ColorPaneComponent)
 customElements.define('rgb-color-slider-group',RGBColorSliderGroupComponent)
 customElements.define('color-slider-comp',ColorSliderComponent)
