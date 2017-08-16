@@ -20,6 +20,8 @@ class ColorSliderComponent extends HTMLElement {
     }
     connectedCallback() {
         this.render()
+        this.mouseHandler = new MouseHandler(this.img,this.component,this.colorSlider)
+        this.mouseHandler.handleMouseActions()
     }
 }
 class ColorSlider {
