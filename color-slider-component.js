@@ -7,8 +7,6 @@ class ColorSliderComponent extends HTMLElement {
         const shadow = this.attachShadow({mode:'open'})
         shadow.appendChild(this.img)
         this.img.draggable = false
-        console.log(this.color)
-        console.log(this.img.draggable)
     }
     render() {
         const canvas = document.createElement('canvas')
@@ -57,7 +55,7 @@ class ColorSlider {
     update(x) {
         if(x<=this.w-this.h/2 && x>=this.h/2) {
             this.x = x
-            this.val = ((this.x)/(this.w-this.h/2))*255
+            this.val = Math.floor(((this.x)/(this.w-this.h/2))*255)
         }
     }
     handleTap(x,y) {
@@ -81,8 +79,8 @@ class MouseHandler {
             if(this.down) {
                 this.colorSlider.update(event.offsetX)
                 this.component.render()
-                if(this.component.getAttribute('onchange')) {
-                    this.component.props.onchange(this.colorSlider.val)
+                if(this.component.onchange) {
+                    this.component.onchange(this.colorSlider.val)
                 }
             }
         }
@@ -99,12 +97,18 @@ class RGBColorSliderGroupComponent extends HTMLElement{
         this.sliders = []
         const colors = ['red','green','blue']
         const shadow = this.attachShadow({mode:'open'})
-        colors.forEach((color)=>{
+        this.r = 0
+        this.g = 0
+        this.b = 0
+        const callbacks = [(val)=>{this.r = val;if(this.onchange){this.onchange(this.r,this.g,this.b);}},(val)=>{this.g = val;if(this.onchange){this.onchange(this.r,this.g,this.b);}},(val)=>{this.b = val;if(this.onchange){this.onchange(this.r,this.g,this.b);}}]
+        colors.forEach((color,index)=>{
             const slider = document.createElement('color-slider-comp')
             const br = document.createElement('br')
-            console.log(slider)
             slider.setAttribute('color',color)
-            slider.getAttribute('color')
+            slider.onchange = (val) => {
+                callbacks[index](val)
+                console.log(this.r,this.g,this.b)
+            }
             shadow.appendChild(slider)
             shadow.appendChild(br)
             this.sliders.push(slider)
