@@ -53,3 +53,29 @@ class ColorSlider {
         return x>=this.x-this.h/2 && x<=this.x+this.h/2 && y>=this.y && y<=this.y+this.h
     }
 }
+class MouseHandler {
+    constructor(dom,component,colorSlider) {
+        this.dom = dom
+        this.component = component
+        this.colorSlider = colorSlider
+        this.down = false
+    }
+    handleMouseActions() {
+        this.dom.onmousedown = (event) =>{
+            if(!this.down && this.colorSlider.handleTap(event.offsetX,event.offsetY)) {
+                this.down = true
+            }
+        }
+        this.dom.onmousemove = (event) => {
+            if(this.down) {
+                this.colorSlider.update(event.offsetX,event.offsetY)
+                this.component.render()
+            }
+        }
+        this.dom.onmouseup = (event) => {
+            if(this.down) {
+                this.down = false
+            }
+        }
+    }
+}
