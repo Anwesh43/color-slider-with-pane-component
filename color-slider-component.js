@@ -7,6 +7,7 @@ class ColorSliderComponent extends HTMLElement {
         const shadow = this.attachShadow({mode:'open'})
         shadow.appendChild(this.img)
         this.img.draggable = false
+        console.log(this.color)
         console.log(this.img.draggable)
     }
     render() {
@@ -31,7 +32,7 @@ class ColorSlider {
         this.color = color
         this.w = w
         this.h = h
-        this.x = 0
+        this.x = this.h/2
         this.y = this.h/2
         this.val = 0
     }
@@ -50,17 +51,17 @@ class ColorSlider {
         context.lineTo(this.x,this.h/2)
         context.stroke()
         context.beginPath()
-        context.arc(this.x+this.h/4,this.y,this.h/2,0,2*Math.PI)
+        context.arc(this.x,this.y,this.h/3,0,2*Math.PI)
         context.fill()
     }
     update(x) {
-        if(x<=this.w-3*this.h/4 && x>=this.h/4) {
+        if(x<=this.w-this.h/2 && x>=this.h/2) {
             this.x = x
             this.val = ((this.x)/(this.w-this.h/2))*255
         }
     }
     handleTap(x,y) {
-        return x>=this.x-this.h/2 && x<=this.x+this.h/2 && y>=this.y && y<=this.y+this.h
+        return x>=this.x-this.h && x<=this.x+this.h && y>=this.y && y<=this.y+this.h
     }
 }
 class MouseHandler {
@@ -80,6 +81,9 @@ class MouseHandler {
             if(this.down) {
                 this.colorSlider.update(event.offsetX)
                 this.component.render()
+                if(this.component.getAttribute('onchange')) {
+                    this.component.props.onchange(this.colorSlider.val)
+                }
             }
         }
         this.dom.onmouseup = (event) => {
@@ -89,4 +93,24 @@ class MouseHandler {
         }
     }
 }
+class RGBColorSliderGroupComponent extends HTMLElement{
+    constructor() {
+        super()
+        this.sliders = []
+        const colors = ['red','green','blue']
+        const shadow = this.attachShadow({mode:'open'})
+        colors.forEach((color)=>{
+            const slider = document.createElement('color-slider-comp')
+            const br = document.createElement('br')
+            console.log(slider)
+            slider.setAttribute('color',color)
+            slider.getAttribute('color')
+            shadow.appendChild(slider)
+            shadow.appendChild(br)
+            this.sliders.push(slider)
+        })
+    }
+}
+
+customElements.define('rgb-color-slider-group',RGBColorSliderGroupComponent)
 customElements.define('color-slider-comp',ColorSliderComponent)
