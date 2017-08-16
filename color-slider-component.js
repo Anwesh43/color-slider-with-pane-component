@@ -12,6 +12,10 @@ class ColorSliderComponent extends HTMLElement {
         canvas.width = w/4
         canvas.height = h/20
         const context = canvas.getContext('2d')
+        if(!this.colorSlider) {
+            this.colorSlider = new ColorSlider(this.color,canvas.width,canvas.height)
+        }
+        this.colorSlider.draw(Context)
         this.img.src = canvas.toDataURL()
     }
     connectedCallback() {
